@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run Debug Info Action
         uses: colek42/test_action@v1
@@ -72,7 +72,7 @@ jobs:
           output-file-path: 'debug-data.json'
 
       - name: Upload debug file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: debug-data
           path: debug-data.json
