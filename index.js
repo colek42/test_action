@@ -25,10 +25,27 @@ try {
     fileList = `Error listing files: ${err.message}`;
   }
 
-  // Get git info
+  // Check if we have git command available
+  function isCommandAvailable(command) {
+    try {
+      execSync(`which ${command}`, { stdio: 'ignore' });
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  // Get git info only if git is available
   let gitInfo = '';
-  try {
-    gitInfo = `
+  const isGitAvailable = isCommandAvailable('git');
+  
+  if (isGitAvailable) {
+    try {
+      // Check if we're in a git repo
+      try {
+        execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' });
+        
+        gitInfo = `
 Git Status:
 ${execSync('git status').toString()}
 
@@ -41,8 +58,14 @@ ${execSync('git remote -v').toString()}
 Git Branch:
 ${execSync('git branch').toString()}
 `;
-  } catch (err) {
-    gitInfo = `Error getting git info: ${err.message}`;
+      } catch (err) {
+        gitInfo = 'Not inside a git repository';
+      }
+    } catch (err) {
+      gitInfo = `Error getting git info: ${err.message}`;
+    }
+  } else {
+    gitInfo = 'Git command not available';
   }
 
   // Get GitHub context
@@ -94,6 +117,7 @@ ${execSync('git branch').toString()}
     workingDirectory,
     path: envPath,
     fileList,
+    gitAvailable: isGitAvailable,
     gitInfo,
     githubContext,
     nodeVersion: process.version,
@@ -108,18 +132,26 @@ ${execSync('git branch').toString()}
   console.log(`PATH: ${envPath}`);
   console.log('\nFile Listing:');
   console.log(fileList);
+  
   console.log('\nGit Info:');
-  console.log(gitInfo);
+  if (isGitAvailable) {
+    console.log(gitInfo);
+  } else {
+    console.log('  Git command not available');
+  }
+  
   console.log('\nInputs:');
   console.log(`  String Input: ${stringInput} (${typeof stringInput})`);
   console.log(`  Number Input: ${numberInput} (${typeof numberInput})`);
   console.log(`  Boolean Input: ${booleanInput} (${typeof booleanInput})`);
   console.log(`  Array Input: ${JSON.stringify(arrayInput)} (${typeof arrayInput})`);
   console.log(`  Object Input: ${JSON.stringify(objectInput)} (${typeof objectInput})`);
+  
   console.log('\nNode Info:');
   console.log(`  Version: ${process.version}`);
   console.log(`  Platform: ${process.platform}`);
   console.log(`  Architecture: ${process.arch}`);
+  
   console.log('\nGitHub Context:');
   console.log(JSON.stringify(githubContext, null, 2));
   
