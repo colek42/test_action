@@ -1,0 +1,64 @@
+name: Test Debug Info Action
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run action with default values
+        id: test-default
+        uses: ./
+        
+      - name: Display outputs from default run
+        run: |
+          echo "Working Directory: ${{ steps.test-default.outputs.working-directory }}"
+          echo "File list sample (first 5 lines):"
+          echo "${{ steps.test-default.outputs.file-list }}" | head -n 5
+          
+      - name: Run action with custom values
+        id: test-custom
+        uses: ./
+        with:
+          string-input: 'Hello from GitHub Workflow'
+          number-input: 99
+          boolean-input: false
+          array-input: 'workflow,test,github,action'
+          object-input: '{"name":"Test Workflow","enabled":true,"count":42}'
+          output-file-path: 'custom-debug.json'
+
+      - name: Upload debug files as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: debug-files
+          path: |
+            debug-output.txt
+            custom-debug.json
+
+  test-action-with-checkout-depth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository with full history
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Run action with full git history
+        id: test-with-git
+        uses: ./
+        with:
+          string-input: 'Testing with full git history'
+          output-file-path: 'git-debug.json'
+
+      - name: Upload git debug file
+        uses: actions/upload-artifact@v3
+        with:
+          name: git-debug-file
+          path: git-debug.json
