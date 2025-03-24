@@ -1,13 +1,39 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'Debug Info Action'
+description: 'Output debug information and handle various input types'
 inputs:
-  who-to-greet:
-    description: 'Who to greet'
+  string-input:
+    description: 'A string input'
     required: true
-    default: 'World'
+    default: 'Default string'
+  number-input:
+    description: 'A number input'
+    required: false
+    default: '42'
+  boolean-input:
+    description: 'A boolean input'
+    required: false
+    default: 'true'
+  array-input:
+    description: 'A YAML array input (comma-separated)'
+    required: false
+    default: 'item1,item2,item3'
+  object-input:
+    description: 'A YAML object input (JSON string)'
+    required: false
+    default: '{"key1":"value1","key2":"value2"}'
+  output-file-path:
+    description: 'Path where the output file should be written'
+    required: false
+    default: 'debug-output.txt'
 outputs:
-  time:
-    description: 'The time we greeted you'
+  working-directory:
+    description: 'The working directory path'
+  file-list:
+    description: 'List of files in the working directory'
+  git-info:
+    description: 'Git repository information'
+  all-debug-info:
+    description: 'All debug information combined'
 runs:
   using: 'node20'
   main: 'index.js'
