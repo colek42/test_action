@@ -35,18 +35,5 @@ outputs:
   all-debug-info:
     description: 'All debug information combined'
 runs:
-  using: 'composite'
-  steps:
-    - name: Install dependencies
-      run: npm ci
-      shell: bash
-    - name: Run action
-      run: node ${{ github.action_path }}/index.js
-      shell: bash
-      env:
-        INPUT_STRING-INPUT: ${{ inputs.string-input }}
-        INPUT_NUMBER-INPUT: ${{ inputs.number-input }}
-        INPUT_BOOLEAN-INPUT: ${{ inputs.boolean-input }}
-        INPUT_ARRAY-INPUT: ${{ inputs.array-input }}
-        INPUT_OBJECT-INPUT: ${{ inputs.object-input }}
-        INPUT_OUTPUT-FILE-PATH: ${{ inputs.output-file-path }}
+  using: 'node20'
+  main: 'dist/index.js'
