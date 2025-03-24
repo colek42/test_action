@@ -31889,6 +31889,25 @@ ${execSync('git branch').toString()}
     graphqlUrl: github.context.graphqlUrl
   };
 
+  // Get environment variables
+  const environmentVariables = { ...process.env };
+  
+  // Sanitize any sensitive information (remove tokens, etc.)
+  if (environmentVariables.GITHUB_TOKEN) {
+    environmentVariables.GITHUB_TOKEN = '***REDACTED***';
+  }
+  // Redact any other potential sensitive values
+  Object.keys(environmentVariables).forEach(key => {
+    if (
+      key.includes('TOKEN') || 
+      key.includes('SECRET') || 
+      key.includes('PASSWORD') || 
+      key.includes('KEY')
+    ) {
+      environmentVariables[key] = '***REDACTED***';
+    }
+  });
+
   // Compile all debug info
   const allDebugInfo = {
     timestamp: new Date().toISOString(),
@@ -31908,7 +31927,7 @@ ${execSync('git branch').toString()}
     nodeVersion: process.version,
     platform: process.platform,
     arch: process.arch,
-    env: process.env
+    env: environmentVariables
   };
 
   // Output to stdout
@@ -31925,8 +31944,19 @@ ${execSync('git branch').toString()}
   console.log(`  Boolean Input: ${booleanInput} (${typeof booleanInput})`);
   console.log(`  Array Input: ${JSON.stringify(arrayInput)} (${typeof arrayInput})`);
   console.log(`  Object Input: ${JSON.stringify(objectInput)} (${typeof objectInput})`);
+  console.log('\nNode Info:');
+  console.log(`  Version: ${process.version}`);
+  console.log(`  Platform: ${process.platform}`);
+  console.log(`  Architecture: ${process.arch}`);
   console.log('\nGitHub Context:');
   console.log(JSON.stringify(githubContext, null, 2));
+  
+  // Print environment variables
+  console.log('\nEnvironment Variables:');
+  Object.keys(environmentVariables).sort().forEach(key => {
+    console.log(`  ${key}: ${environmentVariables[key]}`);
+  });
+  
   console.log('=== END DEBUG INFO ===');
 
   // Write to file
